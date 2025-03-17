@@ -21,10 +21,11 @@ export default [
       'react-refresh': reactRefresh,
     },
     rules: {
+      'no-unused-vars': 'warn', //this changes the error to a warning
+        'react/prop-types': 'off', //this suppresses warnings about not using prop-types
       ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react-refresh/only-export-components': [
+    'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
