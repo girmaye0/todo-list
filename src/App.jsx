@@ -1,17 +1,20 @@
 import "./App.css";
 import TodoList from "./TodoList";
 import TodoForm from "./TodoForm";
-import { useState } from "react"; // Import useState
+import { useState } from "react";
 
 function App() {
-  const [newTodo, setNewTodo] = useState("Todo to be added:"); // Create state
+  const [todoList, setTodoList] = useState([]);
+
+  const handleAddTodo = (newTodo) => {
+    setTodoList([...todoList, newTodo]);
+  };
 
   return (
     <div>
       <h1>My Todos</h1>
-      <TodoForm />
-      <p>{newTodo}</p>
-      <TodoList />
+      <TodoForm onAddTodo={handleAddTodo} />
+      <TodoList todoList={todoList} /> {/* Updated prop name */}
     </div>
   );
 }
