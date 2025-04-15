@@ -10,11 +10,16 @@ function App() {
     setTodoList([...todoList, newTodo]);
   };
 
+  const completeTodo = (id) => {
+    const updatedTodos = todoList.filter((todo) => todo.id !== id); // Automatically remove the checked item
+    setTodoList(updatedTodos);
+  };
+
   return (
     <div>
       <h1>My Todos</h1>
       <TodoForm onAddTodo={handleAddTodo} />
-      <TodoList todoList={todoList} /> {/* Updated prop name */}
+      <TodoList todoList={todoList} onCompleteTodo={completeTodo} />
     </div>
   );
 }

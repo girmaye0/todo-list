@@ -1,6 +1,14 @@
-function TodoListItem({ todo }) {
+function TodoListItem({ todo, onCompleteTodo }) {
   return (
-    <li>{todo.title}</li> // Parentheses prevent ASI
+    <li>
+      <input
+        type="checkbox"
+        checked={todo.isCompleted}
+        onChange={() => onCompleteTodo(todo.id)}
+        style={{ display: "inline-block", marginRight: "8px" }}
+      />
+      <form style={{ display: "inline-block" }}>{todo.title}</form>
+    </li>
   );
 }
 
