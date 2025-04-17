@@ -11,7 +11,9 @@ function App() {
   };
 
   const completeTodo = (id) => {
-    const updatedTodos = todoList.filter((todo) => todo.id !== id); // Automatically remove the checked item
+    const updatedTodos = todoList.map((todo) =>
+      todo.id === id ? { ...todo, isCompleted: true } : todo
+    );
     setTodoList(updatedTodos);
   };
 
