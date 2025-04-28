@@ -12,3 +12,6 @@ This application demonstrates how to render a list of items using React's `map()
 4. Start the dev server -npm run dev
 5. Creating branch -week-01-setup
 6. Writting my- todos- list code
+
+week -3 is about props and states
+week-4 addressed basic hooks, event & handlers, and updating states
