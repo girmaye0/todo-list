@@ -1,37 +1,39 @@
 import React, { useState, useRef } from "react";
 import TextInputWithLabel from "../shared/TextInputWithLabel";
 
-function TodoForm({ onAddTodo }) {
-  const [title, setTitle] = useState(""); // State to manage the input value
+function TodoForm({ onAddTodo, isSaving }) {
+  const [title, setTitle] = useState("");
   const todoTitleInput = useRef(null);
 
   const handleInputChange = (event) => {
-    setTitle(event.target.value); // Update the local state on input change
+    setTitle(event.target.value);
   };
 
   const handleAddTodo = (event) => {
     event.preventDefault();
     if (title.trim()) {
-      const id = Date.now();
-      const isCompleted = false;
-      onAddTodo({ title, id, isCompleted });
-      setTitle(""); // Clear the input state after adding todo
+      onAddTodo(title.trim());
+      setTitle("");
       todoTitleInput.current.focus();
     }
   };
 
   return (
     <form onSubmit={handleAddTodo}>
-      <TextInputWithLabel
-        elementId="todoTitle"
-        label="Todo"
-        value={title} // Bind the input value to the state
-        ref={todoTitleInput}
-        onChange={handleInputChange} // Use handleInputChange to update state
-      />
-      <button type="submit" disabled={title.trim() === ""}>
-        Add Todo
-      </button>
+      <div
+        style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+      >
+        <TextInputWithLabel
+          elementId="todoTitle"
+          label="Todo"
+          value={title}
+          ref={todoTitleInput}
+          onChange={handleInputChange}
+        />
+        <button type="submit" disabled={title.trim() === "" || isSaving}>
+          {isSaving ? "Adding..." : "Add Todo"}
+        </button>
+      </div>
     </form>
   );
 }

@@ -41,18 +41,21 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo, onDeleteTodo }) {
   return (
     <li>
       {isEditing ? (
-        <div>
-          {" "}
-          {/* Changed form to div */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           <TextInputWithLabel
+            style={{ flexGrow: 1, marginRight: "8px" }}
             value={workingTitle}
             onChange={handleEdit}
             ref={editInputRef}
             elementId={`editInput-${todo.id}`}
           />
           <button type="button" onClick={handleUpdate}>
-            {" "}
-            {/* Corrected Update button */}
             Update
           </button>
           <button type="button" onClick={handleCancel}>
@@ -61,9 +64,7 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo, onDeleteTodo }) {
         </div>
       ) : (
         <div>
-          {" "}
-          {/* Changed form to div */}
-          <label>
+          <label style={{ marginRight: "8px" }}>
             <input
               type="checkbox"
               id={`checkbox${todo.id}`}
@@ -71,7 +72,12 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo, onDeleteTodo }) {
               onChange={() => onCompleteTodo(todo.id)}
             />
           </label>
-          <span onClick={() => setIsEditing(true)}>{todo.title}</span>
+          <span
+            style={{ marginRight: "8px" }}
+            onClick={() => setIsEditing(true)}
+          >
+            {todo.title}
+          </span>
         </div>
       )}
     </li>
