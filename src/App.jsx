@@ -31,9 +31,11 @@ function App() {
         const fetchedTodos = records.map((record) => {
           const todo = {
             id: record.id,
-            title: record.fields.title || "",
-            isCompleted: record.fields.isCompleted || false,
+            ...record.fields,
           };
+          if (!record.fields.isCompleted) {
+            todo.isCompleted = false;
+          }
           return todo;
         });
         setTodoList(fetchedTodos);
@@ -45,7 +47,16 @@ function App() {
     };
 
     fetchTodos();
-  }, []);
+  });
+
+  const createOptions = (method, payload) => ({
+    method,
+    headers: {
+      Authorization: token,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
   const handleAddTodo = async (newTodoTitle) => {
     const payload = {
@@ -58,14 +69,7 @@ function App() {
         },
       ],
     };
-    const options = {
-      method: "POST",
-      headers: {
-        Authorization: token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    };
+    const options = createOptions("POST", payload);
 
     try {
       setIsSaving(true);
@@ -106,31 +110,17 @@ function App() {
       ],
     };
 
-    const options = {
-      method: "PATCH",
-      headers: {
-        Authorization: token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    };
+    const options = createOptions("PATCH", payload);
 
-    // Optimistic update
     setTodoList((prevTodos) =>
       prevTodos.map((todo) =>
-        todo.id === editedTodo.id
-          ? {
-              ...todo,
-              title: editedTodo.title,
-              isCompleted: editedTodo.isCompleted,
-            }
-          : todo
+        todo.id === editedTodo.id ? { ...editedTodo } : todo
       )
     );
 
     try {
       setIsSaving(true);
-      const resp = await fetch(`${url}/${editedTodo.id}`, options);
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
@@ -164,7 +154,6 @@ function App() {
 
     const updatedIsCompleted = !originalTodo.isCompleted;
 
-    // Optimistic update
     setTodoList((prevTodos) =>
       prevTodos.map((todo) =>
         todo.id === id ? { ...todo, isCompleted: updatedIsCompleted } : todo
@@ -182,22 +171,13 @@ function App() {
       ],
     };
 
-    const options = {
-      method: "PATCH",
-      headers: {
-        Authorization: token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    };
-
+    const options = createOptions("PATCH", payload);
     try {
       setIsSaving(true);
-      const resp = await fetch(`${url}/${id}`, options);
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
-      // No need to update state again optimistically, it's already done
     } catch (error) {
       console.error("Error updating todo completion:", error);
       setErrorMessage(`${error.message}. Reverting todo completion status...`);
