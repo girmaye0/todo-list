@@ -84,8 +84,10 @@ function App() {
       const savedTodo = {
         id: records[0].id,
         ...records[0].fields,
-        isCompleted: records[0].fields.isCompleted || false,
       };
+      if (!savedTodo.isCompleted) {
+        savedTodo.isCompleted = false;
+      }
       setTodoList((prevTodos) => [...prevTodos, savedTodo]);
     } catch (error) {
       console.error("Error adding todo:", error);
@@ -113,7 +115,6 @@ function App() {
 
     const options = createOptions("PATCH", payload);
 
-    // Optimistic update
     setTodoList((prevTodos) =>
       prevTodos.map((todo) =>
         todo.id === editedTodo.id ? { ...editedTodo } : todo
@@ -122,7 +123,7 @@ function App() {
 
     try {
       setIsSaving(true);
-      const resp = await fetch(`${url}/${editedTodo.id}`, options);
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
@@ -130,8 +131,10 @@ function App() {
       const updatedTodo = {
         id: records[0].id,
         ...records[0].fields,
-        isCompleted: records[0].fields.isCompleted || false,
       };
+      if (!updatedTodo.isCompleted) {
+        updatedTodo.isCompleted = false;
+      }
       const updatedTodos = todoList.map((todo) =>
         todo.id === updatedTodo.id ? { ...updatedTodo } : todo
       );
@@ -154,7 +157,6 @@ function App() {
 
     const updatedIsCompleted = !originalTodo.isCompleted;
 
-    // Optimistic update
     setTodoList((prevTodos) =>
       prevTodos.map((todo) =>
         todo.id === id ? { ...todo, isCompleted: updatedIsCompleted } : todo
@@ -173,14 +175,12 @@ function App() {
     };
 
     const options = createOptions("PATCH", payload);
-
     try {
       setIsSaving(true);
-      const resp = await fetch(`${url}/${id}`, options);
+      const resp = await fetch(url, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
-      // No need to update state again optimistically
     } catch (error) {
       console.error("Error updating todo completion:", error);
       setErrorMessage(`${error.message}. Reverting todo completion status...`);
