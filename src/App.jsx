@@ -4,7 +4,9 @@ import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
 import "./App.css";
 
-const encodeUrl = ({ url, sortField, sortDirection, queryString }) => {
+const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
+
+const encodeUrl = ({ sortField, sortDirection, queryString }) => {
   let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
   let searchQuery = "";
   if (queryString) {
@@ -23,7 +25,6 @@ function App() {
   const [sortDirection, setSortDirection] = useState("desc");
   const [queryString, setQueryString] = useState("");
 
-  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
   const token = `Bearer ${import.meta.env.VITE_PAT}`;
 
   const createOptions = useCallback(
@@ -43,7 +44,6 @@ function App() {
       setIsLoading(true);
       try {
         const sortedUrl = encodeUrl({
-          url,
           sortField,
           sortDirection,
           queryString,
@@ -74,7 +74,7 @@ function App() {
     };
 
     fetchTodos();
-  }, [url, token, sortField, sortDirection, queryString]);
+  }, [sortField, sortDirection, queryString, token]);
 
   const handleAddTodo = async (newTodoTitle) => {
     const payload = {
@@ -89,7 +89,6 @@ function App() {
     };
     const options = createOptions("POST", payload);
     const requestUrl = encodeUrl({
-      url,
       sortField,
       sortDirection,
       queryString,
@@ -133,12 +132,6 @@ function App() {
     };
 
     const options = createOptions("PATCH", payload);
-    const requestUrl = encodeUrl({
-      url,
-      sortField,
-      sortDirection,
-      queryString,
-    });
 
     setTodoList((prevTodos) =>
       prevTodos.map((todo) =>
@@ -148,7 +141,7 @@ function App() {
 
     try {
       setIsSaving(true);
-      const resp = await fetch(`${requestUrl}/${editedTodo.id}`, options);
+      const resp = await fetch(`${url}/${editedTodo.id}`, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
@@ -198,16 +191,10 @@ function App() {
     };
 
     const options = createOptions("PATCH", payload);
-    const requestUrl = encodeUrl({
-      url,
-      sortField,
-      sortDirection,
-      queryString,
-    });
 
     try {
       setIsSaving(true);
-      const resp = await fetch(`${requestUrl}/${id}`, options);
+      const resp = await fetch(`${url}/${id}`, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
@@ -225,18 +212,10 @@ function App() {
 
   const deleteTodo = async (id) => {
     const originalTodos = [...todoList];
-    const requestUrl = encodeUrl({
-      url,
-      sortField,
-      sortDirection,
-      queryString,
-    });
-
-    setTodoList((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
 
     try {
       setIsSaving(true);
-      const resp = await fetch(`${requestUrl}/${id}`, {
+      const resp = await fetch(`${url}/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: token,
@@ -246,6 +225,7 @@ function App() {
       if (!resp.ok) {
         throw new Error(resp.message);
       }
+      setTodoList((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
     } catch (error) {
       console.error("Error deleting todo:", error);
       setErrorMessage(`${error.message}. Reverting deletion...`);
