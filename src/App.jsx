@@ -1,15 +1,30 @@
 import React, { useState, useEffect, useCallback } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
+import TodosViewForm from "./features/TodosViewForm";
 import "./App.css";
+
+const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
+
+const encodeUrl = ({ sortField, sortDirection, queryString }) => {
+  let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+  let searchQuery = "";
+  if (queryString) {
+    searchQuery = `&filterByFormula=SEARCH("${queryString}",title)`;
+    console.log(searchQuery);
+  }
+  return encodeURI(`${url}?${sortQuery}${searchQuery}`);
+};
 
 function App() {
   const [todoList, setTodoList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [sortField, setSortField] = useState("createdTime");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [queryString, setQueryString] = useState("");
 
-  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
   const token = `Bearer ${import.meta.env.VITE_PAT}`;
 
   const createOptions = useCallback(
@@ -28,7 +43,12 @@ function App() {
     const fetchTodos = async () => {
       setIsLoading(true);
       try {
-        const resp = await fetch(url, {
+        const sortedUrl = encodeUrl({
+          sortField,
+          sortDirection,
+          queryString,
+        });
+        const resp = await fetch(sortedUrl, {
           method: "GET",
           headers: {
             Authorization: token,
@@ -40,16 +60,11 @@ function App() {
         }
 
         const { records } = await resp.json();
-        const fetchedTodos = records.map((record) => {
-          const todo = {
-            id: record.id,
-            ...record.fields,
-          };
-          if (!record.fields.isCompleted) {
-            todo.isCompleted = false;
-          }
-          return todo;
-        });
+        const fetchedTodos = records.map((record) => ({
+          id: record.id,
+          ...record.fields,
+          isCompleted: record.fields.isCompleted || false,
+        }));
         setTodoList(fetchedTodos);
       } catch (error) {
         setErrorMessage(error.message);
@@ -59,7 +74,7 @@ function App() {
     };
 
     fetchTodos();
-  }, [url, token]);
+  }, [sortField, sortDirection, queryString, token]);
 
   const handleAddTodo = async (newTodoTitle) => {
     const payload = {
@@ -73,10 +88,15 @@ function App() {
       ],
     };
     const options = createOptions("POST", payload);
+    const requestUrl = encodeUrl({
+      sortField,
+      sortDirection,
+      queryString,
+    });
 
     try {
       setIsSaving(true);
-      const resp = await fetch(url, options);
+      const resp = await fetch(requestUrl, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
@@ -84,10 +104,8 @@ function App() {
       const savedTodo = {
         id: records[0].id,
         ...records[0].fields,
+        isCompleted: records[0].fields.isCompleted || false,
       };
-      if (!savedTodo.isCompleted) {
-        savedTodo.isCompleted = false;
-      }
       setTodoList((prevTodos) => [...prevTodos, savedTodo]);
     } catch (error) {
       console.error("Error adding todo:", error);
@@ -123,7 +141,7 @@ function App() {
 
     try {
       setIsSaving(true);
-      const resp = await fetch(url, options);
+      const resp = await fetch(`${url}/${editedTodo.id}`, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
@@ -131,10 +149,8 @@ function App() {
       const updatedTodo = {
         id: records[0].id,
         ...records[0].fields,
+        isCompleted: records[0].fields.isCompleted || false,
       };
-      if (!updatedTodo.isCompleted) {
-        updatedTodo.isCompleted = false;
-      }
       const updatedTodos = todoList.map((todo) =>
         todo.id === updatedTodo.id ? { ...updatedTodo } : todo
       );
@@ -175,9 +191,10 @@ function App() {
     };
 
     const options = createOptions("PATCH", payload);
+
     try {
       setIsSaving(true);
-      const resp = await fetch(url, options);
+      const resp = await fetch(`${url}/${id}`, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
@@ -196,8 +213,6 @@ function App() {
   const deleteTodo = async (id) => {
     const originalTodos = [...todoList];
 
-    setTodoList((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
-
     try {
       setIsSaving(true);
       const resp = await fetch(`${url}/${id}`, {
@@ -210,6 +225,7 @@ function App() {
       if (!resp.ok) {
         throw new Error(resp.message);
       }
+      setTodoList((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
     } catch (error) {
       console.error("Error deleting todo:", error);
       setErrorMessage(`${error.message}. Reverting deletion...`);
@@ -238,9 +254,17 @@ function App() {
         onDeleteTodo={deleteTodo}
         isLoading={isLoading}
       />
+      <hr />
+      <TodosViewForm
+        sortField={sortField}
+        setSortField={setSortField}
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
+        queryString={queryString}
+        setQueryString={setQueryString}
+      />
       {errorMessage && (
         <div>
-          <hr />
           <p>{errorMessage}</p>
           <button onClick={handleDismissError}>Dismiss</button>
         </div>
