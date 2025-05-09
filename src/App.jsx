@@ -4,17 +4,8 @@ import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
 import "./App.css";
 
+// Define the base URL outside the component
 const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
-
-const encodeUrl = ({ sortField, sortDirection, queryString }) => {
-  let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-  let searchQuery = "";
-  if (queryString) {
-    searchQuery = `&filterByFormula=SEARCH("${queryString}",title)`;
-    console.log(searchQuery);
-  }
-  return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-};
 
 function App() {
   const [todoList, setTodoList] = useState([]);
@@ -39,15 +30,21 @@ function App() {
     [token]
   );
 
+  const encodeUrl = useCallback(() => {
+    let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+    let searchQuery = "";
+    if (queryString) {
+      searchQuery = `&filterByFormula=SEARCH("${queryString}",title)`;
+      console.log(searchQuery);
+    }
+    return encodeURI(`${url}?${sortQuery}${searchQuery}`);
+  }, [sortField, sortDirection, queryString, url]);
+
   useEffect(() => {
     const fetchTodos = async () => {
       setIsLoading(true);
       try {
-        const sortedUrl = encodeUrl({
-          sortField,
-          sortDirection,
-          queryString,
-        });
+        const sortedUrl = encodeUrl();
         const resp = await fetch(sortedUrl, {
           method: "GET",
           headers: {
@@ -74,7 +71,7 @@ function App() {
     };
 
     fetchTodos();
-  }, [sortField, sortDirection, queryString, token]);
+  }, [sortField, sortDirection, queryString, token, encodeUrl]);
 
   const handleAddTodo = async (newTodoTitle) => {
     const payload = {
@@ -88,11 +85,7 @@ function App() {
       ],
     };
     const options = createOptions("POST", payload);
-    const requestUrl = encodeUrl({
-      sortField,
-      sortDirection,
-      queryString,
-    });
+    const requestUrl = encodeUrl();
 
     try {
       setIsSaving(true);
@@ -132,12 +125,6 @@ function App() {
     };
 
     const options = createOptions("PATCH", payload);
-
-    setTodoList((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === editedTodo.id ? { ...editedTodo } : todo
-      )
-    );
 
     try {
       setIsSaving(true);
@@ -249,7 +236,7 @@ function App() {
       <TodoForm onAddTodo={handleAddTodo} isSaving={isSaving} />
       <TodoList
         todoList={todoList}
-        onCompleteTodo={completeTodo}
+        onCompleteTodo={completeTodo} // Pass the completeTodo function as a prop
         onUpdateTodo={updateTodo}
         onDeleteTodo={deleteTodo}
         isLoading={isLoading}
