@@ -8,7 +8,7 @@ function TodosViewForm({
   queryString,
   setQueryString,
 }) {
-  const [localQueryString, setLocalQueryString] = useState(queryString); // Local state for search input
+  const [localQueryString, setLocalQueryString] = useState(queryString);
 
   const handleSortFieldChange = (event) => {
     setSortField(event.target.value);
@@ -24,7 +24,7 @@ function TodosViewForm({
 
   const clearSearch = () => {
     setLocalQueryString("");
-    setQueryString(""); // Update the parent immediately on clear
+    setQueryString("");
   };
 
   const preventRefresh = (event) => {
@@ -36,8 +36,8 @@ function TodosViewForm({
       setQueryString(localQueryString);
     }, 500);
 
-    return () => clearTimeout(debounce); // Cleanup function to clear the previous timeout
-  }, [localQueryString, setQueryString]); // Dependencies: localQueryString and setQueryString
+    return () => clearTimeout(debounce);
+  }, [localQueryString, setQueryString]);
 
   return (
     <form onSubmit={preventRefresh}>

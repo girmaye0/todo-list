@@ -4,7 +4,6 @@ import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm";
 import "./App.css";
 
-// Define the base URL outside the component
 const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
 
 function App() {
@@ -236,7 +235,7 @@ function App() {
       <TodoForm onAddTodo={handleAddTodo} isSaving={isSaving} />
       <TodoList
         todoList={todoList}
-        onCompleteTodo={completeTodo} // Pass the completeTodo function as a prop
+        onCompleteTodo={completeTodo}
         onUpdateTodo={updateTodo}
         onDeleteTodo={deleteTodo}
         isLoading={isLoading}
