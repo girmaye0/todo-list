@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 function TodosViewForm({
   sortField,
@@ -8,26 +8,36 @@ function TodosViewForm({
   queryString,
   setQueryString,
 }) {
-  const searchInputRef = useRef(null);
+  const [localQueryString, setLocalQueryString] = useState(queryString);
 
-  useEffect(() => {
-    if (searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }, [queryString]);
+  const handleSortFieldChange = (event) => {
+    setSortField(event.target.value);
+  };
 
-  const handleSearchInputChange = (event) => {
-    setQueryString(event.target.value);
+  const handleSortDirectionChange = (event) => {
+    setSortDirection(event.target.value);
+  };
+
+  const handleLocalSearchInputChange = (event) => {
+    setLocalQueryString(event.target.value);
   };
 
   const clearSearch = () => {
+    setLocalQueryString("");
     setQueryString("");
-    searchInputRef.current.focus();
   };
 
   const preventRefresh = (event) => {
     event.preventDefault();
   };
+
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      setQueryString(localQueryString);
+    }, 500);
+
+    return () => clearTimeout(debounce);
+  }, [localQueryString, setQueryString]);
 
   return (
     <form onSubmit={preventRefresh}>
@@ -36,9 +46,8 @@ function TodosViewForm({
         <input
           type="text"
           id="search"
-          value={queryString}
-          onChange={handleSearchInputChange}
-          ref={searchInputRef}
+          value={localQueryString}
+          onChange={handleLocalSearchInputChange}
         />
         <button type="button" onClick={clearSearch}>
           Clear
@@ -50,7 +59,7 @@ function TodosViewForm({
           <select
             id="sortBy"
             value={sortField}
-            onChange={(e) => setSortField(e.target.value)}
+            onChange={handleSortFieldChange}
           >
             <option value="title">Title</option>
             <option value="createdTime">Time added</option>
@@ -61,7 +70,7 @@ function TodosViewForm({
           <select
             id="sortDirection"
             value={sortDirection}
-            onChange={(e) => setSortDirection(e.target.value)}
+            onChange={handleSortDirectionChange}
           >
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>

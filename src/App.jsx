@@ -1,30 +1,19 @@
 import React, { useState, useEffect, useCallback } from "react";
 import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
-import TodosViewForm from "./features/TodosViewForm";
+import TodosViewForm from "./features/TodosViewForm.jsx";
 import "./App.css";
-
-const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
-
-const encodeUrl = ({ sortField, sortDirection, queryString }) => {
-  let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-  let searchQuery = "";
-  if (queryString) {
-    searchQuery = `&filterByFormula=SEARCH("${queryString}",title)`;
-    console.log(searchQuery);
-  }
-  return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-};
 
 function App() {
   const [todoList, setTodoList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [sortField, setSortField] = useState("createdTime");
-  const [sortDirection, setSortDirection] = useState("desc");
-  const [queryString, setQueryString] = useState("");
+  const [sortField, setSortField] = useState("createdTime"); // Initial sort field
+  const [sortDirection, setSortDirection] = useState("desc"); // Initial sort direction
+  const [queryString, setQueryString] = useState(""); // Added state for search query
 
+  const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
   const token = `Bearer ${import.meta.env.VITE_PAT}`;
 
   const createOptions = useCallback(
@@ -39,22 +28,28 @@ function App() {
     [token]
   );
 
+  const encodeUrl = useCallback(() => {
+    let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
+    let searchQuery = "";
+    if (queryString) {
+      searchQuery = `&filterByFormula=SEARCH("${queryString}",title)`;
+      console.log(searchQuery);
+    }
+    return encodeURI(`${url}?${sortQuery}${searchQuery}`);
+  }, [sortField, sortDirection, queryString]);
+
   useEffect(() => {
     const fetchTodos = async () => {
       setIsLoading(true);
       try {
-        const sortedUrl = encodeUrl({
-          sortField,
-          sortDirection,
-          queryString,
-        });
-        const resp = await fetch(sortedUrl, {
+        const options = {
+          // Store fetch options
           method: "GET",
           headers: {
             Authorization: token,
           },
-        });
-
+        };
+        const resp = await fetch(encodeUrl(), options); // Use encodeUrl() directly
         if (!resp.ok) {
           throw new Error(`HTTP error! Status: ${resp.status}`);
         }
@@ -74,7 +69,7 @@ function App() {
     };
 
     fetchTodos();
-  }, [sortField, sortDirection, queryString, token]);
+  }, [encodeUrl]); // Removed token
 
   const handleAddTodo = async (newTodoTitle) => {
     const payload = {
@@ -88,11 +83,7 @@ function App() {
       ],
     };
     const options = createOptions("POST", payload);
-    const requestUrl = encodeUrl({
-      sortField,
-      sortDirection,
-      queryString,
-    });
+    const requestUrl = encodeUrl();
 
     try {
       setIsSaving(true);
@@ -132,6 +123,7 @@ function App() {
     };
 
     const options = createOptions("PATCH", payload);
+    const requestUrl = encodeUrl();
 
     setTodoList((prevTodos) =>
       prevTodos.map((todo) =>
@@ -141,7 +133,7 @@ function App() {
 
     try {
       setIsSaving(true);
-      const resp = await fetch(`${url}/${editedTodo.id}`, options);
+      const resp = await fetch(`${requestUrl}/${editedTodo.id}`, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
@@ -191,10 +183,11 @@ function App() {
     };
 
     const options = createOptions("PATCH", payload);
+    const requestUrl = encodeUrl();
 
     try {
       setIsSaving(true);
-      const resp = await fetch(`${url}/${id}`, options);
+      const resp = await fetch(`${requestUrl}/${id}`, options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
@@ -212,10 +205,13 @@ function App() {
 
   const deleteTodo = async (id) => {
     const originalTodos = [...todoList];
+    const requestUrl = encodeUrl();
+
+    setTodoList((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
 
     try {
       setIsSaving(true);
-      const resp = await fetch(`${url}/${id}`, {
+      const resp = await fetch(`${requestUrl}/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: token,
@@ -225,7 +221,6 @@ function App() {
       if (!resp.ok) {
         throw new Error(resp.message);
       }
-      setTodoList((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
     } catch (error) {
       console.error("Error deleting todo:", error);
       setErrorMessage(`${error.message}. Reverting deletion...`);
@@ -238,10 +233,6 @@ function App() {
   const handleDismissError = () => {
     setErrorMessage("");
   };
-
-  if (isLoading) {
-    return <div>Loading todos... Please wait.</div>;
-  }
 
   return (
     <div>
