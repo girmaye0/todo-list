@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import TextInputWithLabel from "../../shared/TextInputWithLabel";
+import styles from "./TodoListItem.module.css";
+import checkbox from "../../assets/checkbox.png";
 
 function TodoListItem({ todo, onCompleteTodo, onUpdateTodo, onDeleteTodo }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -39,7 +41,7 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo, onDeleteTodo }) {
   };
 
   return (
-    <li>
+    <li className={styles.TodoListItem}>
       {isEditing ? (
         <div
           style={{
@@ -63,15 +65,39 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo, onDeleteTodo }) {
           </button>
         </div>
       ) : (
-        <div>
-          <label style={{ marginRight: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <label
+            style={{
+              marginRight: "8px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <img
+              src={checkbox}
+              alt="Checkbox"
+              style={{
+                width: "20px",
+                height: "20px",
+                marginRight: "5px",
+                cursor: "pointer",
+              }}
+              onClick={() => onCompleteTodo(todo.id)}
+            />
             <input
               type="checkbox"
               id={`checkbox${todo.id}`}
               checked={todo.isCompleted}
               onChange={() => onCompleteTodo(todo.id)}
+              style={{
+                position: "absolute",
+                opacity: 0,
+                width: "0",
+                height: "0",
+              }}
             />
           </label>
+
           <span
             style={{ marginRight: "8px" }}
             onClick={() => setIsEditing(true)}
