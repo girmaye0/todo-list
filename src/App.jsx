@@ -3,15 +3,20 @@ import TodoList from "./features/TodoList/TodoList";
 import TodoForm from "./features/TodoForm";
 import TodosViewForm from "./features/TodosViewForm.jsx";
 import "./App.css";
+import styles from "./App.module.css";
+import background from "./assets/background.jpg";
+import checkbox from "./assets/checkbox.png";
+import logo from "./assets/logo.png";
+import error from "./assets/error.png";
 
 function App() {
   const [todoList, setTodoList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [sortField, setSortField] = useState("createdTime"); // Initial sort field
-  const [sortDirection, setSortDirection] = useState("desc"); // Initial sort direction
-  const [queryString, setQueryString] = useState(""); // Added state for search query
+  const [sortField, setSortField] = useState("createdTime");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const [queryString, setQueryString] = useState("");
 
   const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
   const token = `Bearer ${import.meta.env.VITE_PAT}`;
@@ -49,7 +54,7 @@ function App() {
             Authorization: token,
           },
         };
-        const resp = await fetch(encodeUrl(), options); // Use encodeUrl() directly
+        const resp = await fetch(encodeUrl(), options);
         if (!resp.ok) {
           throw new Error(`HTTP error! Status: ${resp.status}`);
         }
@@ -69,7 +74,7 @@ function App() {
     };
 
     fetchTodos();
-  }, [encodeUrl]); // Removed token
+  }, [encodeUrl]);
 
   const handleAddTodo = async (newTodoTitle) => {
     const payload = {
@@ -235,8 +240,11 @@ function App() {
   };
 
   return (
-    <div>
-      <h1>My Todos</h1>
+    <div className={styles.appContainer}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <img src={logo} alt="Logo" style={{ width: "50px", height: "50px" }} />
+        <h1>My Todos</h1>
+      </div>
       <TodoForm onAddTodo={handleAddTodo} isSaving={isSaving} />
       <TodoList
         todoList={todoList}
@@ -255,7 +263,20 @@ function App() {
         setQueryString={setQueryString}
       />
       {errorMessage && (
-        <div>
+        <div
+          className={styles.errorMessage}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            color: "red",
+          }}
+        >
+          <img
+            src={error}
+            alt="Error Icon"
+            style={{ width: "10px", height: "10px" }}
+          />
           <p>{errorMessage}</p>
           <button onClick={handleDismissError}>Dismiss</button>
         </div>

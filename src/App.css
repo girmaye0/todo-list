@@ -1,0 +1,49 @@
+body {
+  font-family: "Arial", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Georgia", serif;
+  color: green;
+}
+
+body,
+#root {
+  background-image: url();
+  background-color: #12c2ee;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  background-color: #00eeff;
+  color: white;
+  padding: 0.625em 0.9375em;
+  border: none;
+  border-radius: 0.3125em;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+input[type="text"],
+textarea {
+  padding: 0.625em;
+  border: 0.0625em solid #ccc;
+  border-radius: 0.25em;
+  font-size: 1em;
+  width: 100%;
+  max-width: 25em;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #007bff;
+  outline: none;
+}
