@@ -9,14 +9,14 @@ h3 {
   color: green;
 }
 
-body,
+/* body,
 #root {
   background-image: url();
   background-color: #12c2ee;
   color: #333;
   margin: 0;
   padding: 0;
-}
+} */
 
 button {
   background-color: #00eeff;

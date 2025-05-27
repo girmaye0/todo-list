@@ -41,7 +41,7 @@ function TodoListItem({ todo, onCompleteTodo, onUpdateTodo, onDeleteTodo }) {
   };
 
   return (
-    <li className={styles.TodoListItem}>
+    <li className={styles.todoListItem}>
       {isEditing ? (
         <div
           style={{
