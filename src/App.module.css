@@ -1,0 +1,45 @@
+body,
+#root {
+  background-color: #f4f4f4;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  max-width: 800px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: rgb(103, 171, 235);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.errorContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: red;
+  font-weight: bold;
+  border: 2px solid red;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #ffe0e0;
+  margin-top: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.errorContainer img {
+  width: 20px;
+  height: 20px;
+}
