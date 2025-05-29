@@ -124,7 +124,7 @@ function App() {
     const options = createOptions("PATCH", payload);
     const requestUrl = url;
 
-    dispatch({ type: todoActions.updateTodo, todo: editedTodo });
+    dispatch({ type: todoActions.updateTodo, editedTodo: editedTodo });
     dispatch({ type: todoActions.startRequest });
 
     try {
@@ -235,7 +235,7 @@ function App() {
         <h1>My Todos</h1>
       </div>
 
-      <TodoForm onAddTodo={handleAddTodo} isSaving={isSaving} />
+      <TodoForm onAddTodo={handleAddTodo} isSaving={todoState.isSaving} />
 
       <TodoList
         todoList={todoList}
