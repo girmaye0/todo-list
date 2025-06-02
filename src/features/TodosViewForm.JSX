@@ -84,9 +84,13 @@ function TodosViewForm({
   sortDirection,
   setSortDirection,
   queryString,
-  setQueryString,
+  setQueryStringSetter,
 }) {
   const [localQueryString, setLocalQueryString] = useState(queryString);
+
+  useEffect(() => {
+    setLocalQueryString(queryString);
+  }, [queryString]);
 
   const handleSortFieldChange = (event) => {
     setSortField(event.target.value);
@@ -102,7 +106,7 @@ function TodosViewForm({
 
   const clearSearch = () => {
     setLocalQueryString("");
-    setQueryString("");
+    setQueryStringSetter("");
   };
 
   const preventRefresh = (event) => {
@@ -111,11 +115,11 @@ function TodosViewForm({
 
   useEffect(() => {
     const debounce = setTimeout(() => {
-      setQueryString(localQueryString);
+      setQueryStringSetter(localQueryString);
     }, 500);
 
     return () => clearTimeout(debounce);
-  }, [localQueryString, setQueryString]);
+  }, [localQueryString, setQueryStringSetter]);
 
   return (
     <StyledFormView onSubmit={preventRefresh}>
