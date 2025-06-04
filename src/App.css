@@ -1,49 +1,112 @@
-body {
-  font-family: "Arial", sans-serif;
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: rgb(216, 227, 235);
+  box-shadow: 0 2px 4px rgba(12, 189, 196, 0.1);
 }
 
-h1,
-h2,
-h3 {
-  font-family: "Georgia", serif;
-  color: green;
-}
-
-/* body,
-#root {
-  background-image: url();
-  background-color: #12c2ee;
-  color: #333;
+/*
+body, #root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f4f4;
   margin: 0;
   padding: 0;
-} */
+  font-family: "Arial", sans-serif;
+  color: #333;
+}
+*/
 
-button {
-  background-color: #00eeff;
-  color: white;
-  padding: 0.625em 0.9375em;
-  border: none;
-  border-radius: 0.3125em;
-  cursor: pointer;
-  font-size: 1em;
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-button:hover {
+.appHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.appLogo {
+  width: 50px;
+  height: 50px;
+}
+
+.separator {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 20px 0;
+}
+
+.paginationControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.paginationButton {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+}
+
+.paginationButton:hover:not(:disabled) {
   background-color: #0056b3;
 }
 
-input[type="text"],
-textarea {
-  padding: 0.625em;
-  border: 0.0625em solid #ccc;
-  border-radius: 0.25em;
-  font-size: 1em;
-  width: 100%;
-  max-width: 25em;
+.paginationButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
-input:focus,
-textarea:focus {
-  border-color: #007bff;
-  outline: none;
+.errorContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: red;
+  font-weight: bold;
+  border: 2px solid red;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #ffe0e0;
+  margin-top: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.errorIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.aboutPage {
+  padding: 20px;
+  text-align: center;
 }
