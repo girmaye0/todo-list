@@ -89,7 +89,7 @@ function App() {
       setPageTitle("Not Found");
     }
   }, [location]);
-  const itemsPerPage = 4;
+  const itemsPerPage = 15;
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const filteredByQuery = queryString
     ? todoList.filter((todo) =>

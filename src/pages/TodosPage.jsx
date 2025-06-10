@@ -28,10 +28,10 @@ function TodosPage({
 }) {
   return (
     <>
-      <div className={styles.appHeader}>
+      {/* <div className={styles.appHeader}>
         <img src={logo} alt="Logo" className={styles.appLogo} />
         <h1>My Todos</h1>
-      </div>
+      </div> */}
 
       <TodoForm onAddTodo={handleAddTodo} isSaving={isSaving} />
 
